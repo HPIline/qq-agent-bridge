@@ -2,8 +2,12 @@
 
 基于 [NapCat](https://github.com/NapNeko/NapCatQQ)（OneBot v11）的 QQ 私聊 AI 助手，可对接任意 OpenAI 兼容模型。
 
-支持文字对话、图片理解、视频分析、文件收发与任务执行：收到消息后交给模型处理，模型可以在受限的工作目录内
-读写文件、执行命令、联网检索，并把产出的文件直接发回 QQ。全部数据与密钥保存在本机。
+支持文字对话、图片理解、视频分析、文件收发与任务执行：消息交给模型处理后，模型可在受限的工作目录内读写文件、
+执行命令、联网检索，并把产出的文件直接发回 QQ。全部数据与密钥保存在本机。
+
+![交互示意](docs/demo.png)
+
+> 上图为交互示意（非真实截图），实际回复取决于所配置的模型；仓库内可使用自有截图替换 `docs/demo.png`。
 
 ---
 
@@ -33,16 +37,16 @@
 | 图片理解 | 图片直接交给多模态模型；描述中出现不确定项时自动联网补查 |
 | 视频分析 | 下载后抽帧逐帧描述，结合字幕与语音转写，输出结构化总结 |
 | 文件收发 | 读取 QQ 发来的文档（PDF 支持 OCR 兜底）；模型产出的文件以 `[FILE:]` 标记发回 |
-| 任务执行 | 自动区分闲聊与任务；任务先回执再执行，长任务分阶段汇报并等待"继续/停止" |
+| 任务执行 | 自动区分闲聊与任务；任务先回执再执行，长任务分阶段汇报并等待「继续/停止」 |
 | 日程事务 | 提醒、待办、日历、后台任务队列，数据存于本地 SQLite |
 | 知识库 | 索引本地 `.md` / `.txt` / `.pdf`，支持命令检索与模型主动检索 |
-| 主动消息 | 定时、空闲或日程前主动开口；默认关闭，可配置时段、频率与冷却 |
+| 主动消息 | 定时、空闲或日程前主动发起对话；默认关闭，可配置时段、频率与冷却 |
 | 人格设定 | 默认通用中文助手；可通过配置项或技能目录定义人设、语气与媒体使用频率 |
-| 外部程序互通 | 基于文件的双向通道，其他程序可借该 QQ 号发消息，QQ 消息也可转交处理 |
+| 外部程序互通 | 基于文件的双向通道，其他程序可借该 QQ 号发送消息，QQ 消息也可转交处理 |
 | Web 工作台 | 浏览器内聊天、查看提醒/待办/任务/日志（可选） |
 | 第三方插件 | 兼容 AstrBot 生态中仅依赖 `astrbot.api` 的简单插件（可选） |
 
-模型能力的读写边界由配置项 `workdir` 限定，文件与命令工具均无法越出该目录。
+模型的文件与命令工具均被限制在配置项 `workdir` 指定的目录内。
 
 ## 环境要求
 
@@ -54,7 +58,7 @@
 
 ## 快速开始
 
-### 1. 配置 NapCat
+### 配置 NapCat
 
 建议使用 QQ 小号，避免影响主号。
 
@@ -64,24 +68,30 @@
    - 监听地址 `127.0.0.1`，端口 `3001`，消息格式 `array`
    - 保存后重启 NapCat 生效
 
-### 2. 安装
+### 安装
 
 ```bash
 git clone https://github.com/HPIline/qq-agent-bridge.git
 cd qq-agent-bridge
-./start.sh          # macOS / Linux；首次运行会创建 .venv 并安装依赖
+./start.sh          # macOS / Linux：首次运行自动创建 .venv 并安装依赖
 start.bat           # Windows
 ```
 
-手动安装等价于：
+<details>
+<summary>不使用启动脚本时的手动安装</summary>
 
 ```bash
 python -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt -r requirements-agno.txt
-# Windows: .venv\Scripts\python.exe
+# Windows 路径为 .venv\Scripts\python.exe
 ```
 
-### 3. 配置
+`requirements.txt` 为核心依赖，`requirements-agno.txt` 为模型后端依赖；
+其余可选能力对应 `requirements-web.txt`、`requirements-voice.txt`、`requirements-macos.txt`，按需安装。
+
+</details>
+
+### 配置
 
 ```bash
 cp config.example.json config.json      # Windows: copy config.example.json config.json
@@ -97,7 +107,10 @@ cp config.example.json config.json      # Windows: copy config.example.json conf
 | `api_key` | 接口密钥 | `sk-...` |
 | `model` | 模型名 | `gpt-4o-mini` |
 
-常用服务商配置示例：
+只需填写以上 5 项即可运行，其余配置均有内置默认值，开箱即用。完整清单见 [配置手册](#配置)。
+
+<details>
+<summary>常见服务商配置对照</summary>
 
 | 服务商 | `api_base_url` | `model` |
 | --- | --- | --- |
@@ -106,7 +119,9 @@ cp config.example.json config.json      # Windows: copy config.example.json conf
 | 本地 Ollama | `http://127.0.0.1:11434/v1` | `qwen2.5:14b` |
 | 中转 / 自建网关 | 服务商提供的地址 | 服务商提供的模型名 |
 
-### 4. 启动
+</details>
+
+### 启动
 
 ```bash
 ./start.sh          # macOS / Linux
@@ -133,7 +148,7 @@ start.bat           # Windows
 - 状态数据（日志、SQLite、会话、记忆）默认存放于 `data/`，可用 `data_dir` 重定位；
   `channels/`、`outbox/` 等工作目录固定于项目内。
 
-**完整配置手册（180 项，含默认值与说明）：[CONFIG.md](CONFIG.md)**
+**完整配置手册（180 项，含默认值与逐项说明）：[CONFIG.md](CONFIG.md)** —— 常规使用无需查阅。
 
 常见调整：
 
@@ -150,25 +165,63 @@ start.bat           # Windows
 
 ## 使用
 
-私聊发送消息即可，无需前缀。内置命令（Web 工作台同样可用）：
+私聊发送消息即可，无需前缀。以下命令在 QQ 与 Web 工作台中通用。
+
+### 会话与帮助
 
 | 命令 | 说明 |
 | --- | --- |
 | `/help` | 列出全部命令 |
 | `/new` | 重置当前会话 |
 | `/id` | 查看当前会话 ID |
-| `/提醒 喝水 明天9点` · `/提醒列表` · `/取消提醒 <id>` | 定时提醒 |
-| `/待办 添加 周五交报告` · `/待办` · `/完成 <id>` · `/删除待办 <id>` | 待办清单 |
-| `/日历` | 查看日历 |
-| `/任务 <描述>` · `/任务列表` · `/任务取消 <id>` | 后台任务队列 |
-| `/知识库 重建` · `/知识库 搜 <关键词>` | 本地知识库 |
-| `/天气 北京` · `/技能` | 内置技能 |
-| `/晨报` · `/晨报设置 08:30` | 每日晨报 |
-| `/课表` · `/课表查看` · `/课表清除` | 课表导入与管理 |
-| `/话题` · `/静默` · `/唤醒` | 主动消息控制 |
 | `/角色` | 切换回人格模式 |
 
-模型在回复中可输出媒体标记，由桥接转换为真实消息：
+### 提醒与待办
+
+| 命令 | 说明 |
+| --- | --- |
+| `/提醒 喝水 明天9点` | 新建定时提醒 |
+| `/提醒列表` | 查看已有提醒 |
+| `/取消提醒 <id>` | 取消提醒 |
+| `/待办 添加 周五交报告` | 新建待办 |
+| `/待办` | 查看待办清单 |
+| `/完成 <id>` | 标记完成 |
+| `/删除待办 <id>` | 删除待办 |
+| `/日历` | 查看日历 |
+
+### 任务与知识库
+
+| 命令 | 说明 |
+| --- | --- |
+| `/任务 <描述>` | 提交后台任务 |
+| `/任务列表` | 查看任务队列 |
+| `/任务取消 <id>` | 取消任务 |
+| `/知识库 重建` | 重建本地文档索引 |
+| `/知识库 搜 <关键词>` | 检索知识库 |
+
+### 日程与其他
+
+| 命令 | 说明 |
+| --- | --- |
+| `/课表` | 导入课表（图片 / CSV / Excel） |
+| `/课表查看` | 查看已保存的课表 |
+| `/课表清除` | 删除课表 |
+| `/晨报` | 立即生成晨报 |
+| `/晨报设置 08:30` | 设置每日晨报时间 |
+| `/天气 北京` | 查询天气 |
+| `/技能` | 查看已启用技能 |
+
+### 主动消息控制
+
+| 命令 | 说明 |
+| --- | --- |
+| `/话题` | 立即触发一次主动消息 |
+| `/静默` | 暂停主动消息 |
+| `/唤醒` | 恢复主动消息 |
+
+### 媒体标记
+
+模型在回复中可输出以下标记，由桥接转换为真实消息：
 
 | 标记 | 说明 |
 | --- | --- |
@@ -198,7 +251,10 @@ start.bat           # Windows
 }
 ```
 
-**技能目录**（适合长设定与附带资源）：在 `persona_skill_home`（默认 `~/.agents/skills`）下建立
+<details>
+<summary>技能目录（适合长设定与附带资源）</summary>
+
+在 `persona_skill_home`（默认 `~/.agents/skills`）下建立：
 
 ```text
 ~/.agents/skills/my-persona/SKILL.md
@@ -212,15 +268,18 @@ start.bat           # Windows
 
 提示词会附带该 `SKILL.md` 的绝对路径，由模型自行读取。
 
+</details>
+
 相关配置：`persona_enabled`（开关）、`persona_reset_turns` / `persona_reset_hours`（会话轮换阈值）、
-`chat_style_guide` / `media_frequency_guide` / `proactive_topic_guide`（直接覆盖内置提示词片段）、
+`chat_style_guide` / `media_frequency_guide` / `proactive_topic_guide`（覆盖内置提示词片段）、
 `extra_skill_triggers`（命中关键词时提示模型先读指定技能）。
 
 ## 可选能力
 
 以下能力按需启用，未安装依赖不影响基础对话。
 
-### PDF OCR
+<details>
+<summary>PDF OCR</summary>
 
 PDF 含文字层时无需额外依赖；扫描件需本机安装 poppler 与 tesseract：
 
@@ -231,7 +290,10 @@ sudo apt install poppler-utils tesseract-ocr   # Linux
 
 Windows 安装后将目录写入环境变量：`QQBOT_PDF_TOOL_DIR="C:\Program Files\poppler\Library\bin"`。
 
-### 视频语音转写
+</details>
+
+<details>
+<summary>视频语音转写</summary>
 
 默认 `video_asr_backend: "auto"`，按平台选择可用后端：
 
@@ -243,7 +305,10 @@ pip install -r requirements-macos.txt     # Apple Silicon（mlx-whisper）
 
 缺少任一后端时自动跳过转写，画面与字幕分析仍正常执行。
 
-### 语音回复
+</details>
+
+<details>
+<summary>语音回复</summary>
 
 默认关闭。需要本地 GPT-SoVITS 服务：
 
@@ -253,7 +318,10 @@ pip install -r requirements-voice.txt     # 需 C 编译工具链
 
 配置 `tts_backend: "local"`、`tts_local_url`、`tts_models_dir`、`tts_character`、`tts_ref`。
 
-### Web 工作台
+</details>
+
+<details>
+<summary>Web 工作台</summary>
 
 ```bash
 pip install -r requirements-web.txt
@@ -265,13 +333,19 @@ pip install -r requirements-web.txt
 
 访问 `http://127.0.0.1:8080`，填入 `web_token` 即可。
 
-### 外部程序互通
+</details>
+
+<details>
+<summary>外部程序互通</summary>
 
 其他程序（定时脚本、其他助手）可通过文件通道借该 QQ 号发送消息，QQ 收到的消息也可转交处理：
 写入 `channels/to_qq/` 的 JSON 信封会被发送，QQ 消息记录在 `channels/from_qq/`。
 协议详见 [channels/README.md](channels/README.md)。
 
-### AstrBot 插件
+</details>
+
+<details>
+<summary>AstrBot 插件</summary>
 
 兼容仅依赖 `astrbot.api` 的简单插件，默认关闭：
 
@@ -281,11 +355,14 @@ pip install -r requirements-web.txt
 
 插件放入 `astrbot_plugins/`（每个插件一个子目录，内含 `main.py`）。详见 [VIDEO_ASTRBOT.md](VIDEO_ASTRBOT.md)。
 
+</details>
+
 ## 常驻运行
 
 程序本身不负责开机自启，建议交由系统服务管理器。
 
-**Linux（systemd）**
+<details>
+<summary>Linux（systemd）</summary>
 
 ```ini
 # /etc/systemd/system/qq-agent-bridge.service
@@ -307,41 +384,88 @@ WantedBy=multi-user.target
 sudo systemctl enable --now qq-agent-bridge
 ```
 
-**macOS（launchd）**：注册 plist，将 `ProgramArguments` 指向 `.venv/bin/python bridge.py`。
+</details>
 
-**Windows**：在「任务计划程序」中创建登录时启动的任务，程序填 `.venv\Scripts\python.exe`，参数填 `bridge.py`。
+<details>
+<summary>macOS（launchd）</summary>
 
-配置 `restart_command` 后，`/restart` 命令可用：
+注册 plist，将 `ProgramArguments` 指向 `.venv/bin/python bridge.py`：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.example.qq-agent-bridge</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/qq-agent-bridge/.venv/bin/python</string>
+    <string>/opt/qq-agent-bridge/bridge.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/opt/qq-agent-bridge</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+</dict>
+</plist>
+```
+
+</details>
+
+<details>
+<summary>Windows（任务计划程序）</summary>
+
+创建「登录时启动」任务：程序填 `.venv\Scripts\python.exe`，参数填 `bridge.py`，
+起始位置填项目目录。
+
+</details>
+
+<details>
+<summary>启用 /restart 命令</summary>
+
+配置对应的重启命令即可：
 
 ```json
 { "restart_command": "systemctl restart qq-agent-bridge" }
 ```
 
+未配置时，macOS 会尝试 launchd 服务，其它平台记录日志并跳过。
+
+</details>
+
 ## 常见问题
 
-**发送消息无响应**
+### 发送消息无响应
+
 依次检查：NapCat 是否运行且已用小号登录；发送方 QQ 号是否在 `full_access_qq` 中；是否为私聊消息。
 仍无响应时查看 `data/bridge.log`。
 
-**启动报"未配置模型 API key"**
+### 启动报「未配置模型 API key」
+
 填写 `config.json` 的 `api_key`，或设置环境变量 `QQBOT_API_KEY`。
 
-**回复慢或频繁超时**
+### 回复慢或频繁超时
+
 将 `chat_effort` 调为 `low`、`chat_timeout` 调大；任务类可保留 `task_effort: "max"`。
 
-**提示"看不清这张图片"**
+### 提示「看不清这张图片」
+
 当前模型不支持图片输入。更换多模态模型，或将 `vision_model` 单独指向多模态模型。
 
-**视频未被分析**
+### 视频未被分析
+
 确认 `video_analysis_enabled` 为 `true`。长视频耗时较长，可调小 `video_max_frames`。
 
-**模型无法发回文件**
+### 模型无法发回文件
+
 `[FILE:]` 中的路径必须是运行程序所在机器上的绝对路径，且文件真实存在。
 
-**担心影响本机文件**
-文件与命令工具被限制在 `workdir` 内。建议将 `workdir` 设为专用空目录，不要指向家目录或系统目录。
+### 是否支持群聊
 
-**是否支持群聊**
 当前仅支持私聊。
 
 ## 安全建议
@@ -368,7 +492,7 @@ python -m pytest        # 300+ 用例
 ruff check .
 ```
 
-版本变更见 [CHANGELOG.md](CHANGELOG.md)。
+版本变更见 [CHANGELOG.md](CHANGELOG.md)；首屏示意图由 `tools/make_demo_image.py` 生成。
 
 ## English
 
