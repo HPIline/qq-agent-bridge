@@ -492,7 +492,7 @@ python -m pytest        # 300+ 用例
 ruff check .
 ```
 
-版本变更见 [CHANGELOG.md](CHANGELOG.md)；首屏示意图由 `tools/make_demo_image.py` 生成。
+版本变更见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## English
 
