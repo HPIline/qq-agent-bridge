@@ -113,7 +113,7 @@ cp config.example.json config.json      # Windows: copy config.example.json conf
 start.bat           # Windows
 ```
 
-启动后向小号发送「你好」验证连通性。日志位于 `data/bridge.log`。
+启动后向小号发送任意消息（如「测试」）验证连通性。日志位于 `data/bridge.log`。
 
 ## 配置
 
