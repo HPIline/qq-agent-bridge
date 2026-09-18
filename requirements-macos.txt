@@ -1,0 +1,4 @@
+# Apple Silicon 专用：mlx 语音转写后端。
+# Intel Mac / Windows / Linux 请改用 openai-whisper 或 faster-whisper，
+# 并把 config.json 的 video_asr_backend 设成 whisper / faster-whisper。
+mlx-whisper>=0.4.0

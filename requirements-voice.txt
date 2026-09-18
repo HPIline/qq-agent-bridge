@@ -1,0 +1,4 @@
+# QQ 语音条需要把 WAV/MP3 编码成 SILK 格式。
+# pilk 是 sdist 包，安装时需要 C 编译工具链（Windows 上装 VS Build Tools）。
+# 不装也能跑：语音条会降级为失败提示，其它功能不受影响。
+pilk==0.2.4

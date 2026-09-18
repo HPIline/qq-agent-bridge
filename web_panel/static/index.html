@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QQ AI 助手 · 工作台</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+  header { padding: 16px 24px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 18px; margin: 0; }
+  main { max-width: 960px; margin: 24px auto; padding: 0 16px; display: grid; gap: 16px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; }
+  textarea, input { width: 100%; box-sizing: border-box; background: #0f172a; color: #e2e8f0; border: 1px solid #475569; border-radius: 8px; padding: 10px; margin: 6px 0; }
+  button { background: #2563eb; color: white; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+  .replies { white-space: pre-wrap; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px; min-height: 80px; }
+  input#token { max-width: 320px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>QQ AI 助手 · 工作台</h1>
+  <input id="token" type="password" placeholder="访问 Token" value="">
+  <button onclick="saveToken()">保存</button>
+</header>
+<main>
+  <section class="card">
+    <h2>聊天 / 命令</h2>
+    <textarea id="chatInput" rows="3" placeholder="和机器人说点什么，或直接输入 /提醒 喝水 明天9点"></textarea>
+    <button onclick="sendChat()">发送</button>
+    <div class="replies" id="chatReplies"></div>
+  </section>
+  <section class="card">
+    <h2>快捷操作</h2>
+    <button onclick="api('/api/status')">状态</button>
+    <button onclick="api('/api/reminders')">提醒</button>
+    <button onclick="api('/api/todos')">待办</button>
+    <button onclick="api('/api/tasks')">任务</button>
+    <pre id="apiResult"></pre>
+  </section>
+</main>
+<script>
+  const tokenInput = document.getElementById('token');
+  const savedToken = localStorage.getItem('wb_token');
+  if (savedToken) tokenInput.value = savedToken;
+  function token() { return tokenInput.value; }
+  function saveToken() { localStorage.setItem('wb_token', token()); alert('已保存'); }
+  function headers() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }; }
+  async function sendChat() {
+    const text = document.getElementById('chatInput').value;
+    const res = await fetch('/api/chat', { method: 'POST', headers: headers(), body: JSON.stringify({ text }) });
+    const data = await res.json();
+    document.getElementById('chatReplies').textContent = (data.replies || []).join('\n---\n') + (data.detail ? JSON.stringify(data.detail) : '');
+  }
+  async function api(path) {
+    const res = await fetch(path, { headers: headers() });
+    const data = await res.json();
+    document.getElementById('apiResult').textContent = JSON.stringify(data, null, 2);
+  }
+</script>
+</body>
+</html>

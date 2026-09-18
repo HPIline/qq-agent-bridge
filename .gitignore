@@ -1,0 +1,52 @@
+# ---- 本地配置与密钥（绝不提交）----
+config.json
+.env
+*.local.json
+
+# ---- 运行期状态 ----
+data/
+*.db
+*.db-shm
+*.db-wal
+*.log
+sessions.json
+memory.md
+proactive-notes.md
+timetable.json
+channels/from_qq/*
+!channels/from_qq/.gitkeep
+channels/to_qq/*
+!channels/to_qq/sent/
+channels/to_qq/sent/*
+!channels/to_qq/sent/.gitkeep
+channels/state/*
+!channels/state/.gitkeep
+outbox/*
+!outbox/.gitkeep
+inbox/*
+!inbox/.gitkeep
+decisions/*
+!decisions/.gitkeep
+astrbot_plugins/*
+!astrbot_plugins/.gitkeep
+tmp/
+voice_cache/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---- 编辑器 / 系统 ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

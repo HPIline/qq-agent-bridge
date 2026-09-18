@@ -1,0 +1,15 @@
+# ---- 核心依赖（全平台必需）----
+websockets>=14.0
+
+# ---- 可选：媒体 / 文件处理 ----
+openpyxl>=3.1            # 课表导入 xlsx
+imageio-ffmpeg>=0.6.0    # 视频抽帧用的自带 ffmpeg 二进制（按平台分发）
+yt-dlp>=2025.1.1         # 视频链接（B 站等）下载
+
+# ---- 其它可选依赖见同目录 ----
+#   requirements-agno.txt     默认聊天后端（agno + OpenAI 兼容接口）
+#   requirements-web.txt      Web 工作台（fastapi + uvicorn）
+#   requirements-voice.txt    QQ 语音条 SILK 编码（需要编译工具链）
+#   requirements-macos.txt    Apple Silicon 上的 mlx-whisper 语音转写
+#   requirements-dev.txt      开发与测试
+# 语音转写的跨平台后端（openai-whisper / faster-whisper）请按需自行安装。

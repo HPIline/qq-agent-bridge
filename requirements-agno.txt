@@ -1,0 +1,4 @@
+agno>=2.9
+openai>=1.0
+sqlalchemy>=2.0
+ddgs>=9

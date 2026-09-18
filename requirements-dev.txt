@@ -1,0 +1,6 @@
+-r requirements.txt
+-r requirements-agno.txt
+-r requirements-web.txt
+# 开发/静态检查
+pytest>=9.0
+ruff>=0.16
