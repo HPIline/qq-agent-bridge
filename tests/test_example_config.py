@@ -24,7 +24,7 @@ def test_example_config_covers_the_required_keys():
     example = _example()
     missing = [k for k in REQUIRED_IN_EXAMPLE if k not in example]
     assert missing == [], f"config.example.json 缺少这些必填/常用键：{missing}"
-    assert example["full_access_qq"] == ["你的QQ号"]
+    assert example["full_access_qq"] == ["请填写QQ号"]
 
 
 def test_example_config_has_no_secrets_or_local_paths():

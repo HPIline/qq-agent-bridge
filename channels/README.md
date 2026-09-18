@@ -17,7 +17,7 @@ QQ 消息（/本机 前缀）──► channels/from_qq/main.jsonl    不交给�
 
 ```json
 {
-  "to": ["你的QQ号"],
+  "to": ["123456789"],
   "text": "要发送的内容",
   "kind": "report",
   "id": "可选，唯一编号"

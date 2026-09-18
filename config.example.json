@@ -1,7 +1,7 @@
 {
   "onebot_ws_url": "ws://127.0.0.1:3001",
   "full_access_qq": [
-    "你的QQ号"
+    "请填写QQ号"
   ],
   "api_base_url": "https://api.openai.com/v1",
   "api_key": "",

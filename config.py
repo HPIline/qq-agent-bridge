@@ -494,9 +494,9 @@ def load_config(path: str | os.PathLike[str] | None = None) -> dict[str, Any]:
     cfg["full_access_qq"] = [str(item) for item in (cfg.get("full_access_qq") or [])]
     if not cfg["full_access_qq"]:
         raise ValueError(
-            "还没有配置允许的 QQ 号：请把 config.example.json 复制成 config.json，"
-            "把 full_access_qq 改成你自己的 QQ 号；也可以直接用环境变量 "
-            "QQBOT_FULL_ACCESS_QQ='[\"你的QQ号\"]'。"
+            "未配置允许使用的 QQ 号：请将 config.example.json 复制为 config.json，"
+            "填写 full_access_qq；也可直接使用环境变量 "
+            "QQBOT_FULL_ACCESS_QQ='[\"123456789\"]'。"
         )
     if bool(cfg.get("web_enabled", False)):
         web_token = str(cfg.get("web_token") or "").strip()

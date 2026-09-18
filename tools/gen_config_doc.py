@@ -95,7 +95,7 @@ GROUPS: list[tuple[str, str, list[str]]] = [
     ),
     (
         "任务分阶段",
-        "大任务跑一段就汇报一次，等你回复「继续」或「停止」。",
+        "大任务分阶段执行，每到阶段末尾汇报进度并等待「继续」或「停止」。",
         [
             "task_stage_enabled", "task_stage_timeout", "task_stage_max",
             "task_stage_summary_timeout", "task_stage_continue_keywords",
@@ -104,7 +104,7 @@ GROUPS: list[tuple[str, str, list[str]]] = [
     ),
     (
         "人格设定",
-        "留空就是普通助手；填了就是你自己的助手人设。",
+        "留空为通用助手；填写后按设定的人设回应。",
         [
             "persona_enabled", "persona_name", "persona_prompt", "persona_skill",
             "persona_skill_home", "persona_ack_lines", "persona_chat_max_chars",
@@ -122,7 +122,7 @@ GROUPS: list[tuple[str, str, list[str]]] = [
     ),
     (
         "主动消息",
-        "定时 / 长时间没消息 / 日程前主动找你（默认关闭）。",
+        "定时、空闲或日程前主动发起对话（默认关闭）。",
         [
             "proactive_enabled", "proactive_fixed_times", "proactive_idle_minutes",
             "proactive_cooldown_minutes", "proactive_windows", "proactive_max_per_day",
@@ -198,7 +198,7 @@ DESCRIPTIONS: dict[str, str] = {
     "full_access_qq": "**必填**。允许使用机器人的 QQ 号列表；不在列表里的私聊会被忽略",
     # 目录与状态文件
     "data_dir": "日志 / 数据库 / 会话 / 记忆的存放目录，默认项目下的 `data/`",
-    "workdir": "助手的文件读写和命令执行范围；留空 = 项目目录。建议指向一个可以随便折腾的目录",
+    "workdir": "助手的文件读写与命令执行范围；留空 = 项目目录。建议使用专用的空目录",
     "log_file": "日志文件名（相对 `data_dir`）",
     "log_level": "日志级别：DEBUG / INFO / WARNING / ERROR",
     "state_db_file": "提醒 / 待办 / 任务 / 知识库索引的 SQLite 文件",
@@ -287,7 +287,7 @@ DESCRIPTIONS: dict[str, str] = {
     "task_ack_lines": "收到任务先回的短句（可随机选一条）",
     "ack_delay_sec": "先回「收到」的延迟（秒）",
     # 任务分阶段
-    "task_stage_enabled": "大任务分阶段执行：跑一段就汇报并等你确认",
+    "task_stage_enabled": "大任务分阶段执行：每到阶段末尾汇报进度并等待确认",
     "task_stage_timeout": "每个阶段最长执行时间（秒）",
     "task_stage_max": "最多几个阶段",
     "task_stage_summary_timeout": "阶段总结超时（秒）",
@@ -337,7 +337,7 @@ DESCRIPTIONS: dict[str, str] = {
     "proactive_art_enabled": "素材里包含画师/新作（二次元场景用）",
     "proactive_art_query": "画师推荐搜索关键词",
     "proactive_art_image_query": "新作图片搜索关键词",
-    "proactive_artists": "你关注的画师名单，会附加到搜索里",
+    "proactive_artists": "关注的画师名单，会附加到搜索关键词中",
     # 提醒 / 待办 / 任务 / 知识库
     "scheduler_interval_sec": "提醒调度循环间隔（秒）",
     "task_worker_interval_sec": "后台任务队列轮询间隔（秒）",
@@ -418,10 +418,10 @@ def main() -> int:
     lines: list[str] = [
         "# 配置手册",
         "",
-        "所有可配置项都在这里。**你只需要改 [config.example.json](config.example.json) 里那几行就能跑起来**，",
-        "其余按键都有合理默认值，需要时再动。",
+        "全部可配置项及默认值。**[config.example.json](config.example.json) 只保留必填与最常用的几项**，",
+        "其余配置留空时使用内置默认值，按需调整即可。",
         "",
-        "三种改法（优先级从高到低）：",
+        "配置方式（优先级从高到低）：",
         "",
         "1. 环境变量：任意键都能写成 `QQBOT_<键名大写>`，值按 JSON 解析。",
         "",
@@ -434,10 +434,10 @@ def main() -> int:
         "2. `config.json`（复制 `config.example.json` 得到）。",
         "3. 内置默认值（本手册「默认值」列）。",
         "",
-        "路径类的键：相对路径按「数据类挂 `data_dir`、工作类挂项目目录」解析，",
-        "所以从任何目录启动都不会串。",
+        "路径类键的解析规则：数据类相对路径挂 `data_dir`，工作类相对路径挂项目目录，",
+        "因此从任意工作目录启动均可正确定位。",
         "",
-        "> 配置键改名后旧名字仍然生效（升级时不会失效），启动日志会提示你改成新名字。",
+        "> 配置键改名后旧键名仍然生效，启动日志会给出改名提示。",
         "",
         "---",
         "",

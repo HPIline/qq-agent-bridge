@@ -32,7 +32,7 @@ from vision_client import BROWSER_UA
 # 常驻代理（例如失效的 127.0.0.1:7890）一旦存在，会让模型请求/记忆更新报
 # Connection error / ProxyError。这里在创建任何 HTTP 客户端前统一清掉代理变量，
 # 避免默认客户端或 deepcopy 出来的客户端重新捡起代理。
-# 如果你的网络必须走代理，把 QQBOT_KEEP_PROXY=1（或 config 里 keep_proxy=true）打开。
+# 若网络环境必须走代理，可设置 QQBOT_KEEP_PROXY=1（或 config 中 keep_proxy=true）。
 PROXY_ENV_KEYS = (
     "HTTP_PROXY",
     "HTTPS_PROXY",
